@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <tool name="MB_Cache_Stats" label="MB Cache Stats" icon="SOP_filecache">
+    <script scriptType="python"><![CDATA[import glob
+import os
+import datetime
+import time
+
+nodetypes = {
+"Redshift_Proxy_Output":["RS_archive_file", "cache"],
+"rop_alembic":["filename", "cache"],
+"Redshift_ROP":["RS_outputFileNamePrefix", "render"],
+"file":["file", "cache"],
+"filecache":["file", "cache"],
+"rop_geometry":["sopoutput", "cache"],
+"ifd":["vm_picture", "render"],
+"flipbook":["output", "render"]
+}
+
+message = ''
+
+for n in hou.selectedNodes():
+    type = n.type().name()
+    if type in nodetypes:
+        files = glob.glob(os.path.dirname(hou.expandString(n.parm(str(nodetypes[type][0])).rawValue())) + '/*')
+        
+        files.sort()
+        
+        first = os.path.getmtime(files[0])
+        last = os.path.getmtime(files[-1])
+        
+        diff = int(last - first)
+        
+        dt1 = datetime.datetime.fromtimestamp(first)
+        dt2 = datetime.datetime.fromtimestamp(last)
+        
+        size = 0
+        
+        if first > last: #Contingent incase somehow the last file in the sequence is not the latest file.
+            for i in range(2, len(files)):
+                if os.path.getmtime(files[i]) < os.path.getmtime(files[i-1]):
+                    num = i
+                    break
+            
+            del files[num:len(files)]
+            
+            
+            first = os.path.getmtime(files[0])
+            last = os.path.getmtime(files[-1])
+            
+            diff = int(last - first)
+            
+            dt1 = datetime.datetime.fromtimestamp(first)
+            dt2 = datetime.datetime.fromtimestamp(last)
+        
+        for f in files:
+            size += os.path.getsize(f)
+            
+        if len(hou.selectedNodes()) <= 4:
+            message += '------------------------' + '\n'
+            message += files[0] + '\n'
+            message += 'Time: ' + str(time.strftime("%H:%M:%S", time.gmtime(diff))) + '\n'
+            message += 'Size: ' + str(size/1024/1024) + ' MB' + '\n'
+            message += 'Length: ' + str(len(files)) + ' frames' + '\n'
+            message += 'Start: ' + str(dt1) + '\n'
+            message += 'End: ' + str(dt2) + '\n'
+        else:
+            if len(files) > 1:                
+                print('------------------------')
+                print(files[0])
+                print('Time: ' + str(time.strftime("%H:%M:%S", time.gmtime(diff))))
+                print('Size: ' + str(size/1024/1024) + ' MB')
+                print('Length: ' + str(len(files)) + ' frames')
+                print('Start: ' + str(dt1))
+                print('End: ' + str(dt2))
+                print('------------------------')
+            else:
+                dt1 = datetime.datetime.fromtimestamp(first)
+                
+                size = os.path.getsize(files[0])
+                
+                print('------------------------')
+                print(files[0])
+                print('Size: ' + str(size/1024/1024) + ' MB')
+                print('Time: ' + str(d1))
+                print('------------------------')
+                
+            message = 'Stats are avalible in the terminal!'
+
+hou.ui.displayMessage(message, title='Cache Information')]]></script>
+  </tool>
+</shelfDocument>

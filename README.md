@@ -5,7 +5,7 @@ NOTE that once the tool has found your files it will check if they are all writt
 
 In honesty I had not intended to publish tool because it is so simple, but after noticing how often I have ended up using it lately I've decided up put it up. Never knew how handy I would find it to have a tool that simply gives me the time a cache has taken and how many frames it has compleeted.
 
-Video overview: vimeo link
+Video overview: https://vimeo.com/449053063
 
 
 
@@ -29,7 +29,7 @@ Simply select the tool you want in the shelf and click "Apply" and then "Accept"
 
 
 
-##Usage:
+## Usage:
 
 To use the tool select the node you wish to read the stats from in the network view and click the button in the shelf. A new window will appear with the stats. You can also do this with multiple nodes. Selecting four or less nodes will give you the stats in a simple houdini pop up message window. Any number of nodes higher than four will print all the stats to the terminal and display them there.
 
